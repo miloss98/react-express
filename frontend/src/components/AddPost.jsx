@@ -33,7 +33,8 @@ export const AddPost = () => {
   };
 
   return (
-    <div className="w-full flex justify-center items-center py-10">
+    <div className="flex flex-col gap-2 justify-center items-center py-10">
+      <p className="text-3xl font-semibold"> New post</p>
       <form onSubmit={handleSubmit} noValidate className="gap-2 flex flex-col">
         <div className="gap-2 flex">
           <label htmlFor="title">Title</label>

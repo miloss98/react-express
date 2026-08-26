@@ -10,7 +10,7 @@ export const Home = () => {
       try {
         const response = await fetch("http://localhost:8080/feed/posts");
         const result = await response.json();
-        setPosts(result);
+        setPosts(result.posts);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -26,15 +26,23 @@ export const Home = () => {
   return (
     <div className="w-full flex flex-col items-center justify-center">
       <h1 className="text-3xl py-4"> Feed </h1>
-      {posts &&
-        posts.map((post) => {
-          return (
-            <div key={Math.random} className="flex flex-col">
-              <p> {post.title}</p>{" "}
-            </div>
-          );
-        })}
-
+      <div className="flex flex-col gap-6">
+        {posts &&
+          posts.map((post) => {
+            return (
+              <div
+                key={post._id}
+                className="flex flex-col bg-gray-300 w-xl p-4"
+              >
+                <p className="text-3xl font-bold"> {post.title}</p>
+                <p> {post.content} </p>
+                <p> {post.imageUrl}</p>
+                <p>Author: {post.creator.name}</p>
+                <p> Created at: {post.createdAt}</p>
+              </div>
+            );
+          })}
+      </div>
       <AddPost />
     </div>
   );
