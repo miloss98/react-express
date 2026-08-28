@@ -32,13 +32,13 @@ export const Home = () => {
             return (
               <div
                 key={post._id}
-                className="flex flex-col bg-gray-300 w-xl p-4"
+                className="flex flex-col gap-2 bg-gray-300 w-xl p-4"
               >
                 <p className="text-3xl font-bold"> {post.title}</p>
-                <p> {post.content} </p>
-                <p> {post.imageUrl}</p>
-                <p>Author: {post.creator.name}</p>
-                <p> Created at: {post.createdAt}</p>
+                <img src={post.imageUrl} width={200} height={200} alt="aaa" />
+                <a className="text-red-500" href={`/posts/${post._id}`}>
+                  See details &gt;
+                </a>
               </div>
             );
           })}

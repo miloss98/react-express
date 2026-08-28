@@ -24,6 +24,12 @@ export const AddPost = () => {
         body: JSON.stringify(formData),
       });
 
+      setFormData({
+        title: "",
+        content: "",
+        imageUrl: "",
+      });
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
