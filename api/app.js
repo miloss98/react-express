@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyparser = require("body-parser");
 const mongoose = require("mongoose");
+require("dotenv").config();
 
 const feedRoutes = require("./routes/feed");
 
@@ -21,9 +22,7 @@ app.use((req, res, next) => {
 app.use("/feed", feedRoutes);
 
 mongoose
-  .connect(
-    "mongodb+srv://stojanovic98m_db_user:APCPQ2PPN3ph0tZV@cluster0.sih3hyb.mongodb.net/?appName=Cluster0",
-  )
+  .connect(process.env.MONGO_URL)
   .then((result) => {
     app.listen(8080);
   })
