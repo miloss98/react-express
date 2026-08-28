@@ -65,3 +65,42 @@ exports.getPost = (req, res, next) => {
       next(err);
     });
 };
+
+//update post
+exports.updatePost = (req, res, next) => {
+  const postId = req.params.postId;
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res
+      .status(422)
+      .json({ message: "Validation failed", errors: errors.array() });
+  }
+
+  const title = req.body.title;
+  const content = req.body.content;
+  const imageUrl = req.body.imageUrl;
+
+  Post.findById(postId)
+    .then((post) => {
+      if (!post) {
+        const error = new Error("Could not find post.");
+        error.statusCode = 404;
+        throw error;
+      }
+      post.title = title;
+      post.content = content;
+      post.imageUrl = imageUrl;
+      return post.save();
+    })
+    .then((result) => {
+      res.status(200).json({ message: "post updated", post: result });
+      console.log("✅ PUT /update-post", post);
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
