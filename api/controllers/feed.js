@@ -46,7 +46,10 @@ exports.createPost = (req, res, next) => {
       console.log("✅ POST /feed/create-post", result);
     })
     .catch((err) => {
-      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     });
 };
 
@@ -96,6 +99,27 @@ exports.updatePost = (req, res, next) => {
     .then((result) => {
       res.status(200).json({ message: "post updated", post: result });
       console.log("✅ PUT /update-post", post);
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+//delete post
+exports.deletePost = (req, res, next) => {
+  const postId = req.params.postId;
+  if (!postId) {
+    const error = new Error("Could not find post.");
+    error.statusCode = 404;
+    throw error;
+  }
+  Post.findByIdAndDelete(postId)
+    .then((result) => {
+      res.status(200).json({ message: "post deleted", post: result });
+      console.log("✅ DELETE /delete-post", post);
     })
     .catch((err) => {
       if (!err.statusCode) {
