@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const AddPost = () => {
+export const AddPost = ({ setPosts }) => {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -14,7 +14,7 @@ export const AddPost = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("🚀 Form submit triggered!");
+
     try {
       const response = await fetch("http://localhost:8080/feed/create-post", {
         method: "POST",
@@ -23,16 +23,18 @@ export const AddPost = () => {
         },
         body: JSON.stringify(formData),
       });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+
+      setPosts((prevPosts) => [result.post || result, ...prevPosts]);
 
       setFormData({
         title: "",
         content: "",
         imageUrl: "",
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
     } catch (error) {
       console.log(error);
     }

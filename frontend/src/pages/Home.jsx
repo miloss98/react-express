@@ -31,6 +31,26 @@ export const Home = () => {
     fetchData();
   }, []);
 
+  const handleDeletePost = async (postId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/feed/delete-post/${postId}`,
+        {
+          method: "DELETE",
+        },
+      );
+      const result = await response.json();
+      console.log("delete ", result);
+      if (response.ok) {
+        setPosts((prevPosts) =>
+          prevPosts.filter((post) => post._id !== postId),
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   if (loading) {
     return <p>loading...</p>;
   }
@@ -52,16 +72,24 @@ export const Home = () => {
                 <img src={post.imageUrl} width={200} height={200} alt="aaa" />
 
                 <div className="flex w-full justify-between">
-                  <a className="text-red-500" href={`/posts/${post._id}`}>
+                  <a className="text-orange-500" href={`/posts/${post._id}`}>
                     See details
                   </a>
 
-                  <button
-                    onClick={() => handleEdit(post)}
-                    className="text-blue-500 cursor-pointer"
-                  >
-                    Edit
-                  </button>
+                  <div className="flex gap-2 ">
+                    <button
+                      onClick={() => handleEdit(post)}
+                      className="text-blue-500 cursor-pointer"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeletePost(post._id)}
+                      className="text-red-500 cursor-pointer"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -74,7 +102,7 @@ export const Home = () => {
         onClose={handleCloseModal}
       />
 
-      <AddPost />
+      <AddPost setPosts={setPosts} />
     </div>
   );
 };
