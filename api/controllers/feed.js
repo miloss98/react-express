@@ -98,7 +98,7 @@ exports.updatePost = (req, res, next) => {
     })
     .then((result) => {
       res.status(200).json({ message: "post updated", post: result });
-      console.log("✅ PUT /update-post", post);
+      console.log("✅ PUT /update-post", result);
     })
     .catch((err) => {
       if (!err.statusCode) {
@@ -119,7 +119,7 @@ exports.deletePost = (req, res, next) => {
   Post.findByIdAndDelete(postId)
     .then((result) => {
       res.status(200).json({ message: "post deleted", post: result });
-      console.log("✅ DELETE /delete-post", post);
+      console.log("✅ DELETE /delete-post", result);
     })
     .catch((err) => {
       if (!err.statusCode) {
