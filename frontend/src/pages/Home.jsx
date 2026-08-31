@@ -5,14 +5,14 @@ import { EditPost } from "../components/EditPost";
 export const Home = () => {
   const [posts, setPosts] = useState();
   const [loading, setLoading] = useState(true);
-  const [editingPost, setEditingPost] = useState(null);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   const handleEdit = (post) => {
-    setEditingPost(post);
+    setSelectedPost(post);
   };
 
   const handleCloseModal = () => {
-    setEditingPost(null);
+    setSelectedPost(null);
   };
 
   useEffect(() => {
@@ -49,6 +49,12 @@ export const Home = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+  };
+
+  const handlePostUpdated = (updatedPost) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((p) => (p._id === updatedPost._id ? updatedPost : p)),
+    );
   };
 
   if (loading) {
@@ -97,9 +103,11 @@ export const Home = () => {
       </div>
 
       <EditPost
-        post={editingPost}
-        isOpen={editingPost !== null}
+        key={selectedPost?._id}
+        post={selectedPost}
+        isOpen={selectedPost !== null}
         onClose={handleCloseModal}
+        onPostUpdated={handlePostUpdated}
       />
 
       <AddPost setPosts={setPosts} />

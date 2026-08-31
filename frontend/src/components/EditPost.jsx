@@ -1,10 +1,10 @@
 import { useState } from "react";
 
-export const EditPost = ({ postId, isOpen, onClose }) => {
+export const EditPost = ({ post, isOpen, onClose, onPostUpdated }) => {
   const [formData, setFormData] = useState({
-    title: "",
-    content: "",
-    imageUrl: "",
+    title: post?.title || "",
+    content: post?.content || "",
+    imageUrl: post?.imageUrl || "",
   });
 
   const handleChange = (e) => {
@@ -21,7 +21,7 @@ export const EditPost = ({ postId, isOpen, onClose }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/feed/update-post/${postId}`,
+        `http://localhost:8080/feed/update-post/${post._id}`,
         {
           method: "PUT",
           headers: {
@@ -35,11 +35,12 @@ export const EditPost = ({ postId, isOpen, onClose }) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      setFormData({
-        title: "",
-        content: "",
-        imageUrl: "",
-      });
+      const result = await response.json();
+      const updatedPost = result.post || result;
+
+      if (onPostUpdated) {
+        onPostUpdated(updatedPost);
+      }
 
       onClose();
     } catch (error) {
