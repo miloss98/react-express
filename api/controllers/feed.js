@@ -3,9 +3,24 @@ const { validationResult } = require("express-validator");
 
 //get all posts
 exports.getPosts = (req, res, next) => {
+  const currentPage = req.query.page || 1;
+  const postsPerPage = req.query.limit || 3;
+  let totalItems;
+
   Post.find()
+    .countDocuments()
+    .then((count) => {
+      totalItems = count;
+      return Post.find()
+        .skip((currentPage - 1) * postsPerPage)
+        .limit(postsPerPage);
+    })
     .then((posts) => {
-      res.status(200).json({ posts: posts });
+      res.status(200).json({
+        posts: posts,
+        totalItems: totalItems,
+        postsPerPage: postsPerPage,
+      });
       console.log("✅ GET /feed/posts", posts);
     })
     .catch((err) => {
