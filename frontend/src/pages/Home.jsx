@@ -2,10 +2,14 @@ import { useEffect, useState } from "react";
 import { AddPost } from "../components/AddPost";
 import { EditPost } from "../components/EditPost";
 
+const PAGE_SIZE = 2;
+
 export const Home = () => {
   const [posts, setPosts] = useState();
   const [loading, setLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [totalPosts, setTotalPosts] = useState();
+  const [page, setPage] = useState(1);
 
   const handleEdit = (post) => {
     setSelectedPost(post);
@@ -18,10 +22,13 @@ export const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:8080/feed/posts");
+        const response = await fetch(
+          `http://localhost:8080/feed/posts?page=${page}&limit=${PAGE_SIZE}`,
+        );
         const result = await response.json();
 
         setPosts(result.posts);
+        setTotalPosts(result.totalItems);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -29,7 +36,7 @@ export const Home = () => {
     };
 
     fetchData();
-  }, []);
+  }, [page]);
 
   const handleDeletePost = async (postId) => {
     try {
@@ -100,6 +107,23 @@ export const Home = () => {
               </div>
             );
           })}
+        <div className="flex gap-2 justify-between">
+          <button
+            className="text-green-500 cursor-pointer"
+            disabled={page <= 1}
+            onClick={() => setPage((prev) => prev - 1)}
+          >
+            {"<"} Prev
+          </button>
+          <p> Page {page}</p>
+          <button
+            className="text-green-500 cursor-pointer"
+            disabled={page >= totalPosts / PAGE_SIZE}
+            onClick={() => setPage((prev) => prev + 1)}
+          >
+            Next {">"}
+          </button>
+        </div>
       </div>
 
       <EditPost
