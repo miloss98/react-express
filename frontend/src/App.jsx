@@ -1,14 +1,19 @@
 import { Routes, Route } from "react-router-dom";
-import { Home } from "./pages/Home";
-import { SharedLayout } from "./components/SharedLayout";
-import { SinglePost } from "./components/SinglePost";
+import { Register, Login, Home, SinglePost } from "./pages";
+import { ProtectedRoute, SharedLayout } from "./components";
 
 export const App = () => {
   return (
     <Routes>
       <Route path="/" element={<SharedLayout />}>
-        <Route index element={<Home />} />
-        <Route path="/posts/:postId" element={<SinglePost />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        {/* protected routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route index element={<Home />} />
+          <Route path="/posts/:postId" element={<SinglePost />} />
+        </Route>
       </Route>
     </Routes>
   );
