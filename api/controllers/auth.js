@@ -3,7 +3,7 @@ const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-exports.signup = (req, res, next) => {
+exports.register = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error("Validation failed.");
@@ -27,6 +27,7 @@ exports.signup = (req, res, next) => {
     })
     .then((result) => {
       res.status(201).json({ message: "User created!", userId: result._id });
+      console.log("✅ PUT /register", result);
     })
     .catch((err) => {
       if (!err.statusCode) {
@@ -65,6 +66,7 @@ exports.login = (req, res, next) => {
         { expiresIn: "1h" },
       );
       res.status(200).json({ token: token, userId: loadedUser._id.toString() });
+      console.log("✅ POST /login", "Login successful!");
     })
     .catch((err) => {
       if (!err.statusCode) {
