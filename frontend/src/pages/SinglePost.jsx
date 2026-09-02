@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 export const SinglePost = () => {
   const [postData, setPostData] = useState();
@@ -7,11 +8,18 @@ export const SinglePost = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
 
+  const { token } = useContext(AuthContext);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(
           "http://localhost:8080/feed/post/" + postId,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
         );
         const result = await response.json();
         setPostData(result.post);
@@ -21,7 +29,7 @@ export const SinglePost = () => {
       }
     };
     fetchData();
-  }, [postId]);
+  }, [postId, token]);
 
   if (loading) {
     return <p> loading... </p>;

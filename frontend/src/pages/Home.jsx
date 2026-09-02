@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { AddPost } from "../components/AddPost";
-import { EditPost } from "../components/EditPost";
+import { useEffect, useState, useContext } from "react";
+import { AddPost, EditPost } from "../components";
+import { AuthContext } from "../context/AuthContext";
 
 const PAGE_SIZE = 2;
 
@@ -10,6 +10,8 @@ export const Home = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [totalPosts, setTotalPosts] = useState();
   const [page, setPage] = useState(1);
+
+  const { token } = useContext(AuthContext);
 
   const handleEdit = (post) => {
     setSelectedPost(post);
@@ -24,6 +26,11 @@ export const Home = () => {
       try {
         const response = await fetch(
           `http://localhost:8080/feed/posts?page=${page}&limit=${PAGE_SIZE}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
         );
         const result = await response.json();
 
@@ -36,7 +43,7 @@ export const Home = () => {
     };
 
     fetchData();
-  }, [page]);
+  }, [page, token]);
 
   const handleDeletePost = async (postId) => {
     try {
@@ -46,8 +53,7 @@ export const Home = () => {
           method: "DELETE",
         },
       );
-      const result = await response.json();
-      console.log("delete ", result);
+
       if (response.ok) {
         setPosts((prevPosts) =>
           prevPosts.filter((post) => post._id !== postId),
