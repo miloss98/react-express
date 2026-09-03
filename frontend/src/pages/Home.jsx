@@ -51,6 +51,9 @@ export const Home = () => {
         `http://localhost:8080/feed/delete-post/${postId}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
       );
 

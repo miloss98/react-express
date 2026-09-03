@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 export const AddPost = ({ setPosts }) => {
   const [formData, setFormData] = useState({
@@ -6,6 +7,8 @@ export const AddPost = ({ setPosts }) => {
     content: "",
     imageUrl: "",
   });
+
+  const { token } = useContext(AuthContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,6 +23,7 @@ export const AddPost = ({ setPosts }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
