@@ -1,4 +1,5 @@
 const Post = require("../models/post");
+const User = require("../models/user");
 const { validationResult } = require("express-validator");
 
 //get all posts
@@ -43,20 +44,29 @@ exports.createPost = (req, res, next) => {
   const title = req.body.title;
   const content = req.body.content;
   const imageUrl = req.body.imageUrl;
-  const creator = { name: "Milos" };
+  let creator;
 
   const post = new Post({
     title: title,
     content: content,
     imageUrl: imageUrl,
-    creator: creator,
+    creator: req.userId,
   });
 
   post
     .save()
     .then((result) => {
+      return User.findById(req.userId);
+    })
+    .then((user) => {
+      creator = user;
+      user.posts.push(post);
+      return user.save();
+    })
+    .then((result) => {
       res.status(201).json({
-        post: result,
+        post: post,
+        creator: { _id: creator._id, name: creator.name },
       });
       console.log("✅ POST /feed/create-post", result);
     })
@@ -72,9 +82,12 @@ exports.createPost = (req, res, next) => {
 exports.getPost = (req, res, next) => {
   const postId = req.params.postId;
   Post.findById(postId)
+    .populate("creator", "name")
     .then((post) => {
-      res.status(200).json({ post: post });
-      console.log("✅ GET /feed/post", post);
+      res.status(200).json({
+        post: post,
+      });
+      console.log("✅ GET /feed/post/:postId", post);
     })
     .catch((err) => {
       if (!err.statusCode) {
