@@ -119,6 +119,11 @@ exports.updatePost = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
+      if (post.creator.toString() !== req.userId) {
+        const error = new Error("Not authorized !");
+        error.status = 403;
+        throw error;
+      }
       post.title = title;
       post.content = content;
       post.imageUrl = imageUrl;
@@ -136,17 +141,33 @@ exports.updatePost = (req, res, next) => {
     });
 };
 
-//delete post
+// delete post
 exports.deletePost = (req, res, next) => {
   const postId = req.params.postId;
-  if (!postId) {
-    const error = new Error("Could not find post.");
-    error.statusCode = 404;
-    throw error;
-  }
-  Post.findByIdAndDelete(postId)
+
+  Post.findById(postId)
+    .then((post) => {
+      if (!post) {
+        const error = new Error("Could not find post.");
+        error.statusCode = 404;
+        throw error;
+      }
+      if (post.creator.toString() !== req.userId) {
+        const error = new Error("Not authorized to delete this post.");
+        error.statusCode = 403;
+        throw error;
+      }
+      return Post.findByIdAndDelete(postId);
+    })
     .then((result) => {
-      res.status(200).json({ message: "post deleted", post: result });
+      return User.findById(req.userId);
+    })
+    .then((user) => {
+      user.posts.pull(postId);
+      return user.save();
+    })
+    .then((result) => {
+      res.status(200).json({ message: "Post deleted.", post: result });
       console.log("✅ DELETE /delete-post", result);
     })
     .catch((err) => {
