@@ -27,33 +27,32 @@ exports.getPosts = async (req, res, next) => {
   }
 };
 
-//create new post
 exports.createPost = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res
-      .status(422)
-      .json({ message: "Validation failed", errors: errors.array() });
-  }
-
   const title = req.body.title;
   const content = req.body.content;
   const imageUrl = req.body.imageUrl;
   const creator = req.userId;
 
-  const post = new Post({
-    title: title,
-    content: content,
-    imageUrl: imageUrl,
-    creator: creator,
-  });
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error("Validation failed.");
+      error.statusCode = 422;
+      error.data = errors.array();
+      throw error;
+    }
+
+    const post = new Post({
+      title: title,
+      content: content,
+      imageUrl: imageUrl,
+      creator: creator,
+    });
+
     const result = await post.save();
     const user = await User.findById(req.userId);
 
     user.posts.push(post);
-
     await user.save();
 
     res.status(201).json({
@@ -89,19 +88,20 @@ exports.getPost = async (req, res, next) => {
 //update post
 exports.updatePost = async (req, res, next) => {
   const postId = req.params.postId;
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res
-      .status(422)
-      .json({ message: "Validation failed", errors: errors.array() });
-  }
 
   const title = req.body.title;
   const content = req.body.content;
   const imageUrl = req.body.imageUrl;
 
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error("Validation failed.");
+      error.statusCode = 422;
+      error.data = errors.array();
+      throw error;
+    }
+
     const post = await Post.findById(postId);
 
     if (!post) {
@@ -109,9 +109,10 @@ exports.updatePost = async (req, res, next) => {
       error.statusCode = 404;
       throw error;
     }
+
     if (post.creator.toString() !== req.userId) {
-      const error = new Error("Not authorized !");
-      error.status = 403;
+      const error = new Error("Not authorized!");
+      error.statusCode = 403;
       throw error;
     }
 
